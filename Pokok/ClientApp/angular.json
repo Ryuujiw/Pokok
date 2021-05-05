@@ -37,11 +37,7 @@
               "./node_modules/leaflet/dist/leaflet.css",
               "src/styles.css"
             ],
-            "scripts": [
-              "./node_modules/leaflet/dist/leaflet.js",
-              "./node_modules/heatmap.js/build/heatmap.js",
-              "./node_modules/leaflet-heatmap/leaflet-heatmap.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -97,11 +93,7 @@
               "src/styles.css",
               "./node_modules/leaflet/dist/leaflet.css"
             ],
-            "scripts": [
-              "./node_modules/leaflet/dist/leaflet.js",
-              "./node_modules/heatmap.js/build/heatmap.js",
-              "./node_modules/leaflet-heatmap/leaflet-heatmap.js"
-            ],
+            "scripts": [],
             "assets": [
               "src/assets",
               {
