@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { latLng, tileLayer } from 'leaflet';
-
-declare var L;
-declare var HeatmapOverlay;
+import { Component, OnInit, Inject } from '@angular/core';
+import * as L from 'leaflet';
+import { HttpClient } from '@angular/common/http';
+import 'leaflet.heat/dist/leaflet-heat.js'
+import { getBaseUrl } from '../../main';
 
 @Component({
   selector: 'app-map',
@@ -12,44 +12,44 @@ declare var HeatmapOverlay;
 
 export class MapComponent implements OnInit {
 
-  data = {
-    data: []
-  };
+  private dataPoints: HeatmapDataPoints[];
+  private baseUrl: string;
 
-  heatmapLayer = new HeatmapOverlay({
-    radius: 2,
-    maxOpacity: 0.8,
-    scaleRadius: true,
-    useLocalExtrema: true,
-    latField: 'lat',
-    lngField: 'lng',
-    valueField: 'count'
-  });
+  constructor(private http: HttpClient) {
+  }
 
   options = {
     layers: [
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
-      }),
-      this.heatmapLayer
+      })
     ],
+    gradient: { 0.4: 'grey', 0.65: 'brown', 1: 'lime' },
     zoom: 15,
-    center: latLng([3.0726965, 101.5899273])
+    center: L.latLng([3.0726965, 101.5899273])
   };
 
   onMapReady(map: L.Map) {
-    map.on('mousemove', (event: L.LeafletMouseEvent) => {
-      this.data.data.push({
-        lat: event.latlng.lat,
-        lng: event.latlng.lng,
-        count: 1
+
+    this.http.get<HeatmapDataPoints[]>(getBaseUrl() + 'heatmap').subscribe(result => {
+      this.dataPoints = result;
+
+      let addressPoints: [number, number, number][] = this.dataPoints.map(function (item) {
+        //return new L.LatLng(item.latitude, item.longitude);
+        return [item.latitude, item.longitude, item.weight];
       });
 
-      this.heatmapLayer.setData(this.data);
-    });
+    (L as any).heatLayer(addressPoints, { radius: 25 }).addTo(map);
+
+    }, error => console.error(error));
   }
 
   ngOnInit(): void {
   }
+}
 
+interface HeatmapDataPoints {
+  latitude: number;
+  longitude: number;
+  weight: number;
 }
