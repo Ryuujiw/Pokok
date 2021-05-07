@@ -30,9 +30,9 @@ namespace Pokok.Controllers
         }
 
         [HttpGet("{id}")]
-        public int GetLocation(string id)
+        public Location GetLocation(string id)
         {
-            return 1;
+            return new Location(3.0727, 101.5921, 0.6);
         }
     }
 }
