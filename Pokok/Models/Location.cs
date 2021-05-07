@@ -10,6 +10,12 @@ namespace Pokok.Models
             Longitude = longitude;
             Weight = weight;
         }
+        
+        public Location(double latitude, double longitude)
+        {
+            Latitude = latitude;
+            Longitude = longitude;
+        }
 
         public double Weight { get; set; }
 

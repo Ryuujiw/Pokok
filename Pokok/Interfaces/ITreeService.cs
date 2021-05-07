@@ -7,5 +7,6 @@ namespace Pokok.Interfaces
     {
         IEnumerable<Location> GetAllLocations();
         IEnumerable<Location> GetLocationById(int id);
+        int CreateTree(string name, double latitude, double longitude);
     }
 }
