@@ -2,9 +2,9 @@
 
 namespace Pokok.Models
 {
-    public class Heatmap
+    public class Location
     {
-        public Heatmap(double latitude, double longitude, double weight)
+        public Location(double latitude, double longitude, double weight)
         {
             Latitude = latitude;
             Longitude = longitude;
