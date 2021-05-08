@@ -31,7 +31,7 @@ export class MapComponent implements OnInit {
 
   onMapReady(map: L.Map) {
 
-    this.http.get<HeatmapDataPoints[]>(getBaseUrl() + 'heatmap').subscribe(result => {
+    this.http.get<HeatmapDataPoints[]>(getBaseUrl() + 'api/tree').subscribe(result => {
       this.dataPoints = result;
 
       let addressPoints: [number, number, number][] = this.dataPoints.map(function (item) {

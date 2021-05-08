@@ -8,6 +8,7 @@ using FluentMigrator.Runner;
 using System.Reflection;
 using Pokok.Migrations;
 using Pokok.DataAccess.Migrations;
+using Dapper.FluentMap;
 
 namespace Pokok
 {
@@ -37,6 +38,8 @@ namespace Pokok
                     .WithGlobalConnectionString("Persist Security Info = False; Integrated Security = true; Initial Catalog = PokokDB;")
                     .AddSqlServer()
                     .ScanIn(Assembly.GetExecutingAssembly()).For.All());
+            // Add access to configuration
+            services.AddSingleton<IConfiguration>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

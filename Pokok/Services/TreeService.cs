@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Pokok.DataAccess;
-using Pokok.Interfaces;
 using Pokok.Models;
 
 namespace Pokok.Services
 {
-    public class TreeService : ITreeService
+    public class TreeService
     {
+        public SqlDataAccess DataAccess { get; set; }
+
+        public TreeService(string connectionString)
+        {
+            DataAccess = new SqlDataAccess(connectionString);
+        }
+
         public int CreateTree(string species, double latitude, double longitude)
         {
             Guid id = Guid.NewGuid();
@@ -21,17 +24,21 @@ namespace Pokok.Services
             string sql = @"insert into dbo.Tree (Id, Species, Latitude, Longitude)
                             values (@Id, @Species, @Latitude, @Longitude);";
 
-            return SqlDataAccess.SaveData(sql, tree);
+            return DataAccess.SaveData(sql, tree);
         }
 
         public IEnumerable<Location> GetAllLocations()
         {
-            throw new NotImplementedException();
+            string sql = @"select latitude, longitude from dbo.Tree";
+
+            return DataAccess.LoadData<Location>(sql);
         }
 
-        public IEnumerable<Location> GetLocationById(int id)
+        public IEnumerable<Location> GetLocationById(Guid id)
         {
-            throw new NotImplementedException();
+            string sql = @"select latitude, longitude from dbo.Tree where Id = @Id";
+
+            return DataAccess.LoadData<Location>(sql);
         }
 
 

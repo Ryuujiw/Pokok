@@ -2,13 +2,12 @@ using Moq;
 using Xunit;
 using Pokok.Models;
 using Pokok.Services;
-using Pokok.Interfaces;
 
 namespace Pokok.Tests
 {
     public class TreeTest
     {
-        public Mock<ITreeService> mock = new Mock<ITreeService>();
+        public Mock<TreeService> mock = new Mock<TreeService>();
 
         [Fact]
         public void GetLocations()
@@ -20,7 +19,7 @@ namespace Pokok.Tests
         [InlineData(1)]
         public void GetLocationById(int id)
         {
-
+            int jk = id + 1;
         }
     }
 }

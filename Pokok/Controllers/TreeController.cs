@@ -4,6 +4,9 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Pokok.Models;
+using Pokok.Services;
+using Microsoft.Extensions.Configuration;
+using System.Drawing;
 
 namespace Pokok.Controllers
 {
@@ -12,21 +15,20 @@ namespace Pokok.Controllers
     public class TreeController : ControllerBase
     {
         private readonly ILogger<TreeController> _logger;
+        private readonly IConfiguration _configuration;
+        public TreeService TreeService { get; set; }
 
-        public TreeController(ILogger<TreeController> logger)
+        public TreeController(ILogger<TreeController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
+            TreeService = new TreeService(configuration.GetConnectionString("PokokDB"));
         }
 
         [HttpGet]
         public IEnumerable<Location> ListLocations()
         {
-            return new Location[] {
-                    new Location(3.0727, 101.5921, 0.6),
-                    new Location(3.0727356, 101.5824709, 0.5),
-                    new Location(3.0668511, 101.5908615, 0.7),
-                    new Location(3.0768062, 101.5806735, 1)
-            };
+            return TreeService.GetAllLocations();
         }
 
         [HttpGet("{id}")]
