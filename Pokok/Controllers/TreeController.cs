@@ -32,9 +32,9 @@ namespace Pokok.Controllers
         }
 
         [HttpGet("{id}")]
-        public Location GetLocation(string id)
+        public Location GetLocation(Guid id)
         {
-            return new Location(3.0727, 101.5921, 0.6);
+            return TreeService.GetLocationById(id);
         }
     }
 }

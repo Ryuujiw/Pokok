@@ -34,7 +34,7 @@ namespace Pokok.Services
             return DataAccess.LoadData<Location>(sql);
         }
 
-        public IEnumerable<Location> GetLocationById(Guid id)
+        public Location GetLocationById(Guid id)
         {
             string sql = @"select latitude, longitude from dbo.Tree where Id = @Id";
 
