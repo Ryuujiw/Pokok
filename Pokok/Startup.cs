@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using FluentMigrator.Runner;
+using System.Reflection;
+using Pokok.Migrations;
+using Pokok.DataAccess.Migrations;
+using Dapper.FluentMap;
 
 namespace Pokok
 {
@@ -26,6 +30,16 @@ namespace Pokok
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            // Add Fluent Migrator
+            services
+                .AddLogging(c => c.AddFluentMigratorConsole())
+                .AddFluentMigratorCore()
+                .ConfigureRunner(c => c
+                    .WithGlobalConnectionString("Persist Security Info = False; Integrated Security = true; Initial Catalog = PokokDB;")
+                    .AddSqlServer()
+                    .ScanIn(Assembly.GetExecutingAssembly()).For.All());
+            // Add access to configuration
+            services.AddSingleton<IConfiguration>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,6 +84,10 @@ namespace Pokok
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+
+            // Start database migration
+            Database.EnsureDatabase("Persist Security Info = False; Integrated Security = true; Initial Catalog = master;", "PokokDB");
+            app.Migrate();
         }
     }
 }

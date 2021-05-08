@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet'
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -28,7 +29,8 @@ import { MapComponent } from './map/map.component';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'map', component: MapComponent },
       { path: 'fetch-data', component: FetchDataComponent },
-    ])
+    ]),
+    LeafletModule
   ],
   providers: [],
   bootstrap: [AppComponent]
