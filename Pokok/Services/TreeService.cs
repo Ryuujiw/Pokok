@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Pokok.DataAccess;
 using Pokok.Models;
@@ -38,7 +39,7 @@ namespace Pokok.Services
         {
             string sql = @"select latitude, longitude from dbo.Tree where Id = @Id";
 
-            return DataAccess.LoadData<Location>(sql);
+            return DataAccess.LoadData<Location>(sql).First();
         }
 
 
