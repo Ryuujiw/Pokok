@@ -9,6 +9,7 @@ using System.Reflection;
 using Pokok.Migrations;
 using Pokok.DataAccess.Migrations;
 using Dapper.FluentMap;
+using Hangfire;
 
 namespace Pokok
 {
@@ -35,11 +36,14 @@ namespace Pokok
                 .AddLogging(c => c.AddFluentMigratorConsole())
                 .AddFluentMigratorCore()
                 .ConfigureRunner(c => c
-                    .WithGlobalConnectionString("Persist Security Info = False; Integrated Security = true; Initial Catalog = PokokDB;")
+                    .WithGlobalConnectionString(Configuration.GetConnectionString("PokokDB"))
                     .AddSqlServer()
                     .ScanIn(Assembly.GetExecutingAssembly()).For.All());
             // Add access to configuration
             services.AddSingleton<IConfiguration>(Configuration);
+            // Add background job instance
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("PokokDB")));
+            services.AddHangfireServer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

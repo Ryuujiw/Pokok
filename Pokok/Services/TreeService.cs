@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Pokok.DataAccess;
 using Pokok.Models;
@@ -25,7 +26,11 @@ namespace Pokok.Services
             string sql = @"insert into dbo.Tree (Id, Species, Latitude, Longitude)
                             values (@Id, @Species, @Latitude, @Longitude);";
 
-            return DataAccess.SaveData(sql, tree);
+            int rowsAffected = DataAccess.SaveData(sql, tree);
+
+            BackgroundJob.Enqueue(() => UpdateWeight(id));
+
+            return rowsAffected;
         }
 
         public IEnumerable<Location> GetAllLocations()
@@ -40,6 +45,15 @@ namespace Pokok.Services
             string sql = @"select latitude, longitude from dbo.Tree where Id = @Id";
 
             return DataAccess.LoadData<Location>(sql).First();
+        }
+
+        private void UpdateWeight(Guid id)
+        {
+            Console.WriteLine("Updating weight");
+            /**
+             * 1. Query all the trees within 500m radius
+             * 2. Add weight to trees (assume constant for now)
+             */
         }
 
 
