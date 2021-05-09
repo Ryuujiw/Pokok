@@ -3,4 +3,10 @@
   <div class="container">
     <router-outlet></router-outlet>
   </div>
+
+  <form [formgGroup]="form">
+    Value: {{ form.value | json }}
+
+    <hr />
+  </form>
 </body>

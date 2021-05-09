@@ -35,7 +35,7 @@ namespace Pokok.Services
 
         public IEnumerable<Location> GetAllLocations()
         {
-            string sql = @"select latitude, longitude from dbo.Tree";
+            string sql = @"select latitude, longitude, weight from dbo.Tree";
 
             return DataAccess.LoadData<Location>(sql);
         }

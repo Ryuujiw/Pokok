@@ -12,6 +12,9 @@ import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { MapComponent } from './map/map.component';
 
+import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -25,12 +28,14 @@ import { MapComponent } from './map/map.component';
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'map', component: MapComponent },
       { path: 'fetch-data', component: FetchDataComponent },
     ]),
-    LeafletModule
+    LeafletModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

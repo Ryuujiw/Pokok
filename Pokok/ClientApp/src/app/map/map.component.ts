@@ -2,12 +2,15 @@ import { Component, OnInit, Inject } from '@angular/core';
 import * as L from 'leaflet';
 import { HttpClient } from '@angular/common/http';
 import 'leaflet.heat/dist/leaflet-heat.js'
-import { getBaseUrl } from '../../main';
+import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
+  template: `
+    New Tree: <input type="text" [formControl]="addingNewTree">
+  `
 })
 
 export class MapComponent implements OnInit {
@@ -15,7 +18,11 @@ export class MapComponent implements OnInit {
   private dataPoints: HeatmapDataPoints[];
   private baseUrl: string;
 
-  constructor(private http: HttpClient) {
+  form: FormGroup;
+  addingNewTree = new FormControl('');
+
+  constructor(@Inject('BASE_URL') baseUrl: string, private http: HttpClient, private fb: FormBuilder) {
+    this.baseUrl = baseUrl;
   }
 
   options = {
@@ -31,7 +38,7 @@ export class MapComponent implements OnInit {
 
   onMapReady(map: L.Map) {
 
-    this.http.get<HeatmapDataPoints[]>(getBaseUrl() + 'api/tree').subscribe(result => {
+    this.http.get<HeatmapDataPoints[]>(this.baseUrl + 'api/tree').subscribe(result => {
       this.dataPoints = result;
 
       let addressPoints: [number, number, number][] = this.dataPoints.map(function (item) {
@@ -45,6 +52,13 @@ export class MapComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.form = this.fb.group({
+      latitude: '',
+      longitude: '',
+      species: ''
+    })
+
+    this.form.valueChanges.subscribe(console.log());
   }
 }
 
