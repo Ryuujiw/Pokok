@@ -2,24 +2,23 @@ import { Component, OnInit, Inject } from '@angular/core';
 import * as L from 'leaflet';
 import { HttpClient } from '@angular/common/http';
 import 'leaflet.heat/dist/leaflet-heat.js'
-import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, ValidatorFn, AbstractControl, Validators } from '@angular/forms';
+import { CustomValidatorMatcher, CustomValidators } from '../custom-validators'
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
-  template: `
-    New Tree: <input type="text" [formControl]="addingNewTree">
-  `
 })
 
 export class MapComponent implements OnInit {
 
   private dataPoints: HeatmapDataPoints[];
   private baseUrl: string;
+  customMatcher = new CustomValidatorMatcher
 
-  form: FormGroup;
-  addingNewTree = new FormControl('');
+  treeForm: FormGroup;
+  submitted = false;
 
   constructor(@Inject('BASE_URL') baseUrl: string, private http: HttpClient, private fb: FormBuilder) {
     this.baseUrl = baseUrl;
@@ -42,7 +41,6 @@ export class MapComponent implements OnInit {
       this.dataPoints = result;
 
       let addressPoints: [number, number, number][] = this.dataPoints.map(function (item) {
-        //return new L.LatLng(item.latitude, item.longitude);
         return [item.latitude, item.longitude, item.weight];
       });
 
@@ -52,13 +50,19 @@ export class MapComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.form = this.fb.group({
-      latitude: '',
-      longitude: '',
-      species: ''
+    this.treeForm = this.fb.group({
+      latitude: ['', CustomValidators.latitudeValidation],
+      longitude: ['', CustomValidators.longitudeValidation],
+      species: 'Dunno'
     })
+  }
 
-    this.form.valueChanges.subscribe(console.log());
+  get latitude() {
+    return this.treeForm.get('latitude');
+  }
+
+  get longitude() {
+    return this.treeForm.get('longitude');
   }
 }
 
