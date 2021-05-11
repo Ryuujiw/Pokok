@@ -17,18 +17,14 @@ namespace Pokok.Services
             DataAccess = new SqlDataAccess(connectionString);
         }
 
-        public int CreateTree(string species, double latitude, double longitude)
+        public int CreateTree(Tree tree)
         {
-            Guid id = Guid.NewGuid();
-
-            Tree tree = new Tree(id, latitude, longitude, species);
-
             string sql = @"insert into dbo.Tree (Id, Species, Latitude, Longitude)
-                            values (@Id, @Species, @Latitude, @Longitude);";
+                            values (@TreeId, @Species, @Latitude, @Longitude);";
 
-            int rowsAffected = DataAccess.SaveData(sql, tree);
+            int rowsAffected = DataAccess.SaveData(sql, new { tree.TreeId, tree.Species, tree.Location.Latitude, tree.Location.Longitude });
 
-            BackgroundJob.Enqueue(() => UpdateWeight(id));
+            BackgroundJob.Enqueue(() => UpdateWeight(tree.TreeId));
 
             return rowsAffected;
         }
@@ -47,7 +43,7 @@ namespace Pokok.Services
             return DataAccess.LoadData<Location>(sql).First();
         }
 
-        private void UpdateWeight(Guid id)
+        public void UpdateWeight(Guid id)
         {
             Console.WriteLine("Updating weight");
             /**

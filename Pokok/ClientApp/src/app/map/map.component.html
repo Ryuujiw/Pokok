@@ -4,7 +4,7 @@
      (leafletMapReady)="onMapReady($event)">
 </div>
 
-<form [formGroup]="treeForm">
+<form [formGroup]="treeForm" (ngSubmit)="onSubmit()">
   <hr />
 
   <mat-form-field>

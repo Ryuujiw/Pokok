@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import * as L from 'leaflet';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import 'leaflet.heat/dist/leaflet-heat.js'
 import { FormGroup, FormBuilder, ValidatorFn, AbstractControl, Validators } from '@angular/forms';
 import { CustomValidatorMatcher, CustomValidators } from '../custom-validators'
@@ -53,7 +53,7 @@ export class MapComponent implements OnInit {
     this.treeForm = this.fb.group({
       latitude: ['', CustomValidators.latitudeValidation],
       longitude: ['', CustomValidators.longitudeValidation],
-      species: 'Dunno'
+      species: ''
     })
   }
 
@@ -63,6 +63,34 @@ export class MapComponent implements OnInit {
 
   get longitude() {
     return this.treeForm.get('longitude');
+  }
+
+  get species() {
+    return this.treeForm.get('species');
+  }
+
+  addTree(latitude: number, longitude: number, species: string) {
+    const fields = {
+      latitude: latitude,
+      longitude: longitude,
+      species: species
+    };
+
+    const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+
+    return this.http.post<any>(this.baseUrl + 'api/tree', JSON.stringify(fields), { headers: headers }).subscribe({
+      next: data => {
+        console.log('done');
+      },
+      error: error => {
+        console.log(JSON.stringify(fields));
+        console.error('There was an error', error);
+      }
+    });
+  }
+
+  onSubmit() {
+    this.addTree(this.latitude.value, this.longitude.value, this.species.value);
   }
 }
 

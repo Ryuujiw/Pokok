@@ -8,8 +8,8 @@ using FluentMigrator.Runner;
 using System.Reflection;
 using Pokok.Migrations;
 using Pokok.DataAccess.Migrations;
-using Dapper.FluentMap;
 using Hangfire;
+using Microsoft.OpenApi.Models;
 
 namespace Pokok
 {
@@ -25,7 +25,7 @@ namespace Pokok
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -44,6 +44,15 @@ namespace Pokok
             // Add background job instance
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("PokokDB")));
             services.AddHangfireServer();
+            // Add swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Tree API",
+                    Version = "v1"
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +61,13 @@ namespace Pokok
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                
+                // Start swagger
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tree API");
+                });
             }
             else
             {

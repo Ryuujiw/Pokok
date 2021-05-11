@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Pokok.Models;
 using Pokok.Services;
 using Microsoft.Extensions.Configuration;
-using System.Drawing;
+using Microsoft.AspNetCore.Http;
+using Pokok.Resources;
 
 namespace Pokok.Controllers
 {
@@ -35,6 +35,23 @@ namespace Pokok.Controllers
         public Location GetLocation(Guid id)
         {
             return TreeService.GetLocationById(id);
+        }
+
+        [HttpPost]
+        public ActionResult<Tree> CreateTree([FromBody]TreeResource resource)
+        {
+            try
+            {
+                Tree tree = new Tree(resource.latitude, resource.longitude, resource.species);
+                if ( tree == null) return BadRequest();
+                TreeService.CreateTree(tree);
+                return CreatedAtAction(nameof(Tree), new { id = tree.TreeId }, tree);
+            }
+            catch (Exception e)
+            {
+                // TODO: Log exception somewhere
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error when adding this new tree");
+            }
         }
     }
 }
