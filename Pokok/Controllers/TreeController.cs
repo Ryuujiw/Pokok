@@ -15,13 +15,11 @@ namespace Pokok.Controllers
     public class TreeController : ControllerBase
     {
         private readonly ILogger<TreeController> _logger;
-        private readonly IConfiguration _configuration;
         private ITreeService TreeService { get; set; }
 
-        public TreeController(ILogger<TreeController> logger, IConfiguration configuration, ITreeService service)
+        public TreeController(ILogger<TreeController> logger, ITreeService service)
         {
             _logger = logger;
-            _configuration = configuration;
             TreeService = service;
         }
 

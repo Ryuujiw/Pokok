@@ -22,6 +22,12 @@ namespace Pokok.DataAccess
             return cnn.Query<T>(sql).ToList();
         }
 
+        public List<T> LoadData<T>(string sql, DynamicParameters dbArgs)
+        {
+            using IDbConnection cnn = new SqlConnection(ConnectionString);
+            return cnn.Query<T>(sql, dbArgs).ToList();
+        }
+
         public int SaveData<T>(string sql, T data)
         {
             using IDbConnection cnn = new SqlConnection(ConnectionString);

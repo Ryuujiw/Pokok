@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dapper;
 using Hangfire;
-using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Pokok.DataAccess;
 using Pokok.Interfaces;
 using Pokok.Models;
@@ -41,7 +41,11 @@ namespace Pokok.Services
         {
             string sql = @"select latitude, longitude from dbo.Tree where Id = @Id";
 
-            return _dataAccess.LoadData<Location>(sql).First();
+            // Initialize parameters
+            var dbArgs = new DynamicParameters();
+            dbArgs.Add("Id", id);
+
+            return _dataAccess.LoadData<Location>(sql, dbArgs).First();
         }
 
         public void UpdateWeight(Guid id)
