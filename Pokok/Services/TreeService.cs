@@ -4,17 +4,18 @@ using System.Linq;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Pokok.DataAccess;
+using Pokok.Interfaces;
 using Pokok.Models;
 
 namespace Pokok.Services
 {
-    public class TreeService
+    public class TreeService : ITreeService
     {
-        public SqlDataAccess DataAccess { get; set; }
+        public readonly IDataAccess _dataAccess;
 
-        public TreeService(string connectionString)
+        public TreeService(IDataAccess dataAccess)
         {
-            DataAccess = new SqlDataAccess(connectionString);
+            _dataAccess = dataAccess;
         }
 
         public int CreateTree(Tree tree)
@@ -22,7 +23,7 @@ namespace Pokok.Services
             string sql = @"insert into dbo.Tree (Id, Species, Latitude, Longitude)
                             values (@TreeId, @Species, @Latitude, @Longitude);";
 
-            int rowsAffected = DataAccess.SaveData(sql, new { tree.TreeId, tree.Species, tree.Location.Latitude, tree.Location.Longitude });
+            int rowsAffected = _dataAccess.SaveData(sql, new { tree.TreeId, tree.Species, tree.Location.Latitude, tree.Location.Longitude });
 
             BackgroundJob.Enqueue(() => UpdateWeight(tree.TreeId));
 
@@ -33,14 +34,14 @@ namespace Pokok.Services
         {
             string sql = @"select latitude, longitude, weight from dbo.Tree";
 
-            return DataAccess.LoadData<Location>(sql);
+            return _dataAccess.LoadData<Location>(sql);
         }
 
         public Location GetLocationById(Guid id)
         {
             string sql = @"select latitude, longitude from dbo.Tree where Id = @Id";
 
-            return DataAccess.LoadData<Location>(sql).First();
+            return _dataAccess.LoadData<Location>(sql).First();
         }
 
         public void UpdateWeight(Guid id)

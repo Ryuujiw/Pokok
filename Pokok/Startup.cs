@@ -10,6 +10,9 @@ using Pokok.Migrations;
 using Pokok.DataAccess.Migrations;
 using Hangfire;
 using Microsoft.OpenApi.Models;
+using Pokok.Services;
+using Pokok.Interfaces;
+using Pokok.DataAccess;
 
 namespace Pokok
 {
@@ -53,6 +56,9 @@ namespace Pokok
                     Version = "v1"
                 });
             });
+            // register additional services
+            services.AddScoped<IDataAccess, SqlDataAccess>();
+            services.AddScoped<ITreeService, TreeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

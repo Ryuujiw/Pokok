@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Pokok.Models;
-using Pokok.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using Pokok.Resources;
+using Pokok.Interfaces;
 
 namespace Pokok.Controllers
 {
@@ -16,13 +16,13 @@ namespace Pokok.Controllers
     {
         private readonly ILogger<TreeController> _logger;
         private readonly IConfiguration _configuration;
-        public TreeService TreeService { get; set; }
+        private ITreeService TreeService { get; set; }
 
-        public TreeController(ILogger<TreeController> logger, IConfiguration configuration)
+        public TreeController(ILogger<TreeController> logger, IConfiguration configuration, ITreeService service)
         {
             _logger = logger;
             _configuration = configuration;
-            TreeService = new TreeService(configuration.GetConnectionString("PokokDB"));
+            TreeService = service;
         }
 
         [HttpGet]

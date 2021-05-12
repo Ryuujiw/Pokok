@@ -1,19 +1,19 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
-using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 namespace Pokok.DataAccess
 {
-    public class SqlDataAccess
+    public class SqlDataAccess : IDataAccess
     {
         private string ConnectionString { get; set; }
 
-        public SqlDataAccess(string connectionString)
+        public SqlDataAccess(IConfiguration config)
         {
-            ConnectionString = connectionString;
+            ConnectionString = config.GetConnectionString("PokokDB");
         }
 
         public List<T> LoadData<T>(string sql)
@@ -26,6 +26,10 @@ namespace Pokok.DataAccess
         {
             using IDbConnection cnn = new SqlConnection(ConnectionString);
             return cnn.Execute(sql, data);
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
