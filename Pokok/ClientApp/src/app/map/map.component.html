@@ -1,7 +1,7 @@
 <div style="height: 700px;"
      leaflet
      [leafletOptions]="options"
-     (leafletMapReady)="onMapReady($event)">
+     (leafletMapReady)="fetchTrees($event)">
 </div>
 
 <form [formGroup]="treeForm" (ngSubmit)="onSubmit()">

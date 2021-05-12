@@ -15,6 +15,8 @@ export class MapComponent implements OnInit {
 
   private dataPoints: HeatmapDataPoints[];
   private baseUrl: string;
+  private map: L.Map;
+  private heatmapLayer: L.Layer;
   customMatcher = new CustomValidatorMatcher
 
   treeForm: FormGroup;
@@ -35,7 +37,12 @@ export class MapComponent implements OnInit {
     center: L.latLng([3.0726965, 101.5899273])
   };
 
-  onMapReady(map: L.Map) {
+  fetchTrees(map: L.Map) {
+    this.map = map;
+
+    if (this.heatmapLayer != null) {
+      map.removeLayer(this.heatmapLayer);
+    }
 
     this.http.get<HeatmapDataPoints[]>(this.baseUrl + 'api/tree').subscribe(result => {
       this.dataPoints = result;
@@ -44,7 +51,7 @@ export class MapComponent implements OnInit {
         return [item.latitude, item.longitude, item.weight];
       });
 
-    (L as any).heatLayer(addressPoints, { radius: 25 }).addTo(map);
+      this.heatmapLayer = (L as any).heatLayer(addressPoints, { radius: 50 }).addTo(map);
 
     }, error => console.error(error));
   }
@@ -81,6 +88,8 @@ export class MapComponent implements OnInit {
     return this.http.post<any>(this.baseUrl + 'api/tree', JSON.stringify(fields), { headers: headers }).subscribe({
       next: data => {
         console.log('done');
+        //Refresh the map
+        this.fetchTrees(this.map);
       },
       error: error => {
         console.log(JSON.stringify(fields));
