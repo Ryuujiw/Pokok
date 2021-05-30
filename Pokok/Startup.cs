@@ -8,7 +8,11 @@ using FluentMigrator.Runner;
 using System.Reflection;
 using Pokok.Migrations;
 using Pokok.DataAccess.Migrations;
-using Dapper.FluentMap;
+using Hangfire;
+using Microsoft.OpenApi.Models;
+using Pokok.Services;
+using Pokok.Interfaces;
+using Pokok.DataAccess;
 
 namespace Pokok
 {
@@ -24,7 +28,7 @@ namespace Pokok
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -35,11 +39,26 @@ namespace Pokok
                 .AddLogging(c => c.AddFluentMigratorConsole())
                 .AddFluentMigratorCore()
                 .ConfigureRunner(c => c
-                    .WithGlobalConnectionString("Persist Security Info = False; Integrated Security = true; Initial Catalog = PokokDB;")
+                    .WithGlobalConnectionString(Configuration.GetConnectionString("PokokDB"))
                     .AddSqlServer()
                     .ScanIn(Assembly.GetExecutingAssembly()).For.All());
             // Add access to configuration
             services.AddSingleton<IConfiguration>(Configuration);
+            // Add background job instance
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("PokokDB")));
+            services.AddHangfireServer();
+            // Add swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Tree API",
+                    Version = "v1"
+                });
+            });
+            // register additional services
+            services.AddScoped<IDataAccess, SqlDataAccess>();
+            services.AddScoped<ITreeService, TreeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,6 +67,13 @@ namespace Pokok
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                
+                // Start swagger
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tree API");
+                });
             }
             else
             {

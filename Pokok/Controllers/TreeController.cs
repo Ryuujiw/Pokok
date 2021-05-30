@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Pokok.Models;
-using Pokok.Services;
-using Microsoft.Extensions.Configuration;
-using System.Drawing;
+using Microsoft.AspNetCore.Http;
+using Pokok.Resources;
+using Pokok.Interfaces;
 
 namespace Pokok.Controllers
 {
@@ -15,14 +14,12 @@ namespace Pokok.Controllers
     public class TreeController : ControllerBase
     {
         private readonly ILogger<TreeController> _logger;
-        private readonly IConfiguration _configuration;
-        public TreeService TreeService { get; set; }
+        private ITreeService TreeService { get; set; }
 
-        public TreeController(ILogger<TreeController> logger, IConfiguration configuration)
+        public TreeController(ILogger<TreeController> logger, ITreeService service)
         {
             _logger = logger;
-            _configuration = configuration;
-            TreeService = new TreeService(configuration.GetConnectionString("PokokDB"));
+            TreeService = service;
         }
 
         [HttpGet]
@@ -32,9 +29,26 @@ namespace Pokok.Controllers
         }
 
         [HttpGet("{id}")]
-        public Location GetLocation(string id)
+        public Location GetLocation(Guid id)
         {
-            return new Location(3.0727, 101.5921, 0.6);
+            return TreeService.GetLocationById(id);
+        }
+
+        [HttpPost]
+        public ActionResult<Tree> CreateTree([FromBody]TreeResource resource)
+        {
+            try
+            {
+                Tree tree = new Tree(resource.latitude, resource.longitude, resource.species);
+                if ( tree == null) return BadRequest();
+                TreeService.CreateTree(tree);
+                return CreatedAtAction(nameof(Tree), new { id = tree.Id }, tree);
+            }
+            catch (Exception e)
+            {
+                // TODO: Log exception somewhere
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error when adding this new tree");
+            }
         }
     }
 }

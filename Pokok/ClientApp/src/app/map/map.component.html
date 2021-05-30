@@ -1,5 +1,31 @@
 <div style="height: 700px;"
      leaflet
      [leafletOptions]="options"
-     (leafletMapReady)="onMapReady($event)">
+     (leafletMapReady)="fetchTrees($event)">
 </div>
+
+<form [formGroup]="treeForm" (ngSubmit)="onSubmit()">
+  <hr />
+
+  <mat-form-field>
+    <input matInput placeholder="latitude" formControlName="latitude" />
+    <mat-error>
+    Invalid latitude!
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <input matInput placeholder="longitude" formControlName="longitude" />
+    <mat-error *ngIf="longitude.errors?.invalid && longitude.touched">
+    Invalid longitude!
+    </mat-error>
+  </mat-form-field>
+
+  <br />
+
+  <mat-form-field>
+    <input matInput placeholder="species" formControlName="species" />
+  </mat-form-field>
+
+  <button mat-raised-button [disabled]="treeForm.invalid" color="primary">Add Tree</button>
+</form>

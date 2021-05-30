@@ -1,21 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Pokok.Models
 {
     public class Tree
     {
-        public Guid TreeId { get; set; }
+        public Guid Id { get; set; }
         public Location Location { get; set; }
         public string Species { get; set; }
 
-        public Tree(Guid treeId, double latitude, double longitude, string species)
+        public Tree(double latitude, double longitude, string species)
         {
-            TreeId = treeId;
+            Id = Guid.NewGuid();
             Location = new Location(latitude, longitude);
             Species = species;
         }
+
+        public Tree(Guid id, double latitude, double longitude, string species)
+        {
+            Id = id;
+            Location = new Location(latitude, longitude);
+            Species = species;
+        }
+
+        public Tree() {}
     }
 }

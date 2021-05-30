@@ -1,21 +1,29 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import * as L from 'leaflet';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import 'leaflet.heat/dist/leaflet-heat.js'
-import { getBaseUrl } from '../../main';
+import { FormGroup, FormBuilder, ValidatorFn, AbstractControl, Validators } from '@angular/forms';
+import { CustomValidatorMatcher, CustomValidators } from '../custom-validators'
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
 })
 
 export class MapComponent implements OnInit {
 
   private dataPoints: HeatmapDataPoints[];
   private baseUrl: string;
+  private map: L.Map;
+  private heatmapLayer: L.Layer;
+  customMatcher = new CustomValidatorMatcher
 
-  constructor(private http: HttpClient) {
+  treeForm: FormGroup;
+  submitted = false;
+
+  constructor(@Inject('BASE_URL') baseUrl: string, private http: HttpClient, private fb: FormBuilder) {
+    this.baseUrl = baseUrl;
   }
 
   options = {
@@ -29,22 +37,69 @@ export class MapComponent implements OnInit {
     center: L.latLng([3.0726965, 101.5899273])
   };
 
-  onMapReady(map: L.Map) {
+  fetchTrees(map: L.Map) {
+    this.map = map;
 
-    this.http.get<HeatmapDataPoints[]>(getBaseUrl() + 'api/tree').subscribe(result => {
+    if (this.heatmapLayer != null) {
+      map.removeLayer(this.heatmapLayer);
+    }
+
+    this.http.get<HeatmapDataPoints[]>(this.baseUrl + 'api/tree').subscribe(result => {
       this.dataPoints = result;
 
       let addressPoints: [number, number, number][] = this.dataPoints.map(function (item) {
-        //return new L.LatLng(item.latitude, item.longitude);
         return [item.latitude, item.longitude, item.weight];
       });
 
-    (L as any).heatLayer(addressPoints, { radius: 25 }).addTo(map);
+      this.heatmapLayer = (L as any).heatLayer(addressPoints, { radius: 50 }).addTo(map);
 
     }, error => console.error(error));
   }
 
   ngOnInit(): void {
+    this.treeForm = this.fb.group({
+      latitude: ['', CustomValidators.latitudeValidation],
+      longitude: ['', CustomValidators.longitudeValidation],
+      species: ''
+    })
+  }
+
+  get latitude() {
+    return this.treeForm.get('latitude');
+  }
+
+  get longitude() {
+    return this.treeForm.get('longitude');
+  }
+
+  get species() {
+    return this.treeForm.get('species');
+  }
+
+  addTree(latitude: number, longitude: number, species: string) {
+    const fields = {
+      latitude: latitude,
+      longitude: longitude,
+      species: species
+    };
+
+    const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+
+    return this.http.post<any>(this.baseUrl + 'api/tree', JSON.stringify(fields), { headers: headers }).subscribe({
+      next: data => {
+        console.log('done');
+        //Refresh the map
+        this.fetchTrees(this.map);
+      },
+      error: error => {
+        console.log(JSON.stringify(fields));
+        console.error('There was an error', error);
+      }
+    });
+  }
+
+  onSubmit() {
+    this.addTree(this.latitude.value, this.longitude.value, this.species.value);
   }
 }
 
