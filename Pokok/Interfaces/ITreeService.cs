@@ -9,5 +9,6 @@ namespace Pokok.Interfaces
         int CreateTree(Tree tree);
         IEnumerable<Location> GetAllLocations();
         Location GetLocationById(Guid id);
+        bool UpdateWeight(Tree tree);
     }
 }

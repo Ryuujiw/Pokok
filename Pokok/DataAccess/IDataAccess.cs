@@ -9,5 +9,6 @@ namespace Pokok.DataAccess
         List<T> LoadData<T>(string sql);
         List<T> LoadData<T>(string sql, DynamicParameters dbArgs);
         int SaveData<T>(string sql, T data);
+        int SaveData<T>(string sql, DynamicParameters dbArgs);
     }
 }

@@ -6,6 +6,8 @@ using Pokok.Controllers;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using System;
+using Pokok.Resources;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Pokok.Tests
 {
@@ -48,6 +50,31 @@ namespace Pokok.Tests
             Assert.True(location.Equals(result));
         }
 
+        [Theory]
+        [InlineData(3.12114, 101.299648)]
+        public void CreateTree(double lat, double lng)
+        {
+            Tree expectedTree = new Tree(lat, lng, string.Empty);
+
+            mockTreeService.Setup(p => p.CreateTree(expectedTree)).Returns(1);
+
+            ILogger<TreeController> logger = mockLogger.Object;
+            logger = Mock.Of<ILogger<TreeController>>();
+
+            var treeResource = new TreeResource
+            {
+                latitude = lat,
+                longitude = lng
+            };
+
+            TreeController tree = new TreeController(logger, mockTreeService.Object);
+            ActionResult<Tree> response = tree.CreateTree(treeResource);
+            Tree a = (Tree)(response.Result as CreatedAtActionResult).Value;
+
+            Assert.Equal(expectedTree.Location.Latitude, a.Location.Latitude);
+            Assert.Equal(expectedTree.Location.Longitude, a.Location.Longitude);
+        }
+
         public static IEnumerable<object[]> GuidSingleLocation
         {
             get
@@ -55,6 +82,5 @@ namespace Pokok.Tests
                 yield return new object[] { 3.12114, 101.299648, new Guid("c9014bc1-fb5c-46f8-a397-2ac1d3326e99") };
             }
         }
-
     }
 }

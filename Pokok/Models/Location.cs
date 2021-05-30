@@ -17,6 +17,8 @@ namespace Pokok.Models
             Longitude = longitude;
         }
 
+        public Location() { }
+
         public double Weight { get; set; }
 
         public double Latitude { get; set; }

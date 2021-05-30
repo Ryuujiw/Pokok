@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Pokok.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using Pokok.Resources;
 using Pokok.Interfaces;
@@ -43,7 +42,7 @@ namespace Pokok.Controllers
                 Tree tree = new Tree(resource.latitude, resource.longitude, resource.species);
                 if ( tree == null) return BadRequest();
                 TreeService.CreateTree(tree);
-                return CreatedAtAction(nameof(Tree), new { id = tree.TreeId }, tree);
+                return CreatedAtAction(nameof(Tree), new { id = tree.Id }, tree);
             }
             catch (Exception e)
             {

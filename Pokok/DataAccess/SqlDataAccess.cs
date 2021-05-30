@@ -34,6 +34,12 @@ namespace Pokok.DataAccess
             return cnn.Execute(sql, data);
         }
 
+        public int SaveData<T>(string sql, DynamicParameters dbArgs)
+        {
+            using IDbConnection cnn = new SqlConnection(ConnectionString);
+            return cnn.Execute(sql, dbArgs);
+        }
+
         public void Dispose()
         {
         }

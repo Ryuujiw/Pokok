@@ -4,22 +4,24 @@ namespace Pokok.Models
 {
     public class Tree
     {
-        public Guid TreeId { get; set; }
+        public Guid Id { get; set; }
         public Location Location { get; set; }
         public string Species { get; set; }
 
         public Tree(double latitude, double longitude, string species)
         {
-            TreeId = Guid.NewGuid();
+            Id = Guid.NewGuid();
             Location = new Location(latitude, longitude);
             Species = species;
         }
 
-        public Tree(Guid treeId, double latitude, double longitude, string species)
+        public Tree(Guid id, double latitude, double longitude, string species)
         {
-            TreeId = treeId;
+            Id = id;
             Location = new Location(latitude, longitude);
             Species = species;
         }
+
+        public Tree() {}
     }
 }
