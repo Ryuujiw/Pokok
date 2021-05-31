@@ -13,6 +13,7 @@ using Microsoft.OpenApi.Models;
 using Pokok.Services;
 using Pokok.Interfaces;
 using Pokok.DataAccess;
+using System.IO;
 
 namespace Pokok
 {
@@ -103,7 +104,7 @@ namespace Pokok
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
                 // see https://go.microsoft.com/fwlink/?linkid=864501
 
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = Path.Join(env.ContentRootPath, "ClientApp");
 
                 if (env.IsDevelopment())
                 {
@@ -112,7 +113,7 @@ namespace Pokok
             });
 
             // Start database migration
-            Database.EnsureDatabase("Persist Security Info = False; Integrated Security = true; Initial Catalog = master;", "PokokDB");
+            Database.EnsureDatabase(Configuration.GetConnectionString("PokokDB"), "PokokDB");
             app.Migrate();
         }
     }
